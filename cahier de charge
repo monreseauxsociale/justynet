@@ -1,0 +1,189 @@
+cahier de charge :
+creer se site web resaux social pour moi en php css bootstrap javascript et mysql, n'utilise pas react , juste utilise: php css bootstrap javascript et mysql
+
+**cahier des charges complet** pour **Justy**, une **application web** utilisant **PHP, MySQL, Bootstrap, CSS, JavaScript**, qui regroupe **toutes les fonctionnalités** de **WhatsApp**, **YouTube** et **Facebook**, y compris :
+
+* **Chaînes, vidéos, playlists, recherche, commentaires, partages, téléchargements** (comme sur YouTube)
+* **Discussions privées et de groupe, statuts, appels, partage de fichiers, contacts, présence en ligne** (comme WhatsApp)
+* **Publications, fil d’actualité, profils, amis, groupes, pages, réactions, événements** (comme Facebook)
+
+Tu veux aussi :
+
+* Une **expérience mobile-first**
+* Des **notifications web** (PC et mobile)
+* Une **structure MVC**
+* Un **système original** malgré l'inspiration des grands réseaux
+
+---
+
+## 📄 Cahier des Charges Complet – Application Web "Justy"
+
+---
+
+### 🧠 1. Objectif
+
+**Créer une application web tout-en-un**, inspirée de WhatsApp, YouTube et Facebook, mais **intégrée dans une seule interface cohérente et originale**, pensée **mobile-first**.
+
+---
+
+### 🧩 2. Fonctionnalités Détailées
+
+---
+
+## 🔵 A. MODULE YOUTUBE-LIKE – **Partage Vidéo**
+
+### 🎥 1. Gestion des Chaînes
+
+* Création de **chaînes personnelles ou thématiques**
+* Modification de bannière, nom, description
+* Ajout de lien sociaux (optionnel)
+
+### 📹 2. Vidéos
+
+* Téléversement (formats courants : mp4, webm, etc.)
+* Ajout de titre, description, miniature personnalisée
+* Choix de visibilité : **public / privé / non répertorié**
+* Gestion des tags pour la recherche
+* Affichage de la vidéo (lecteur HTML5 responsive)
+* **Téléchargement possible** (si autorisé par l’auteur)
+
+### 📂 3. Playlists
+
+* Création de playlists publiques ou privées
+* Ajout/suppression de vidéos à une playlist
+
+### 🔍 4. Découverte & Recherche
+
+* **Moteur de recherche** avancé (par titre, tags, chaîne)
+* **Section Découverte** (recommandations par vues, likes, thèmes)
+* Tri : populaires, tendances, récentes
+* Filtrage par catégories (musique, gaming, actu, etc.)
+
+### 💬 5. Interactions
+
+* Likes / Dislikes
+* Commentaires (fil de discussion sous vidéo)
+* Bouton Partager (lien intégré, vers réseaux internes)
+* Nombre de vues, de partages, de téléchargements
+* Abonnement aux chaînes
+* Notification à chaque nouvelle vidéo publiée
+
+---
+
+## 🟢 B. MODULE WHATSAPP-LIKE – **Messagerie Instantanée**
+
+### 💬 1. Discussions
+
+* Liste des contacts / utilisateurs
+* Discussion individuelle en temps réel (AJAX / polling)
+* Messages texte, image, audio, vidéo, documents
+* Réactions (emoji)
+* Notifications (visuelles et push)
+* Messages épinglés / supprimés
+* Affichage du **statut "vu" / "non lu" / "en ligne"**
+
+### 👥 2. Groupes
+
+* Création de groupes
+* Ajout / exclusion de membres
+* Nom et image de groupe
+* Messages collectifs
+* Mention d'utilisateurs (@nom)
+
+### 📷 3. Statuts (Stories)
+
+* Publication de statuts image / texte / vidéo
+* Expiration après 24h
+* Vue par utilisateur
+* Commentaires privés sur statut
+
+### 📞 4. Appels
+
+* (Optionnel) Lien vers des appels audio/vidéo via WebRTC ou services externes (non gérable en PHP seul)
+
+---
+
+## 🔴 C. MODULE FACEBOOK-LIKE – **Réseau Social**
+
+### 🧑‍🤝‍🧑 1. Profils & Amis
+
+* Création de profil (avatar, bio, infos perso)
+* Ajout d’amis / abonnements
+* Paramètres de confidentialité
+* Blocage / signalement d’utilisateurs
+
+### 📰 2. Fil d’actualité
+
+* Publications (texte, image, vidéo, liens)
+* Likes / Réactions
+* Commentaires (avec réponses)
+* Partages
+* Tri par popularité / récence / pertinence
+
+### 🧾 3. Pages & Groupes
+
+* Création de **Pages** (artistes, marques, créateurs)
+* Création de **Groupes** (privés ou publics)
+* Publication dans un groupe
+* Administration (ajout admins, suppression)
+
+### 📅 4. Événements
+
+* Création d’événements (nom, lieu, date, description)
+* Invitations
+* Participation (Intéressé, Participe)
+* Rappel via notifications
+
+---
+
+## 🔔 D. NOTIFICATIONS WEB
+
+### 🔧 1. Types
+
+* Nouveau message
+* Nouveau commentaire / like
+* Nouvelle vidéo d’un abonné
+* Invitation à un événement
+* Réaction sur un post
+* Téléchargement terminé
+* Mention dans un groupe / commentaire
+
+### 📲 2. Systèmes
+
+* **Notifications via JavaScript Notification API**
+* (Optionnel) Push avec Service Workers
+* Centre de notification dans l’interface
+
+---
+
+## 🌟 E. ORIGINALITÉS DE JUSTY
+
+* **Réseau hybride** : possibilité de naviguer **en mode messagerie**, **en mode vidéo**, ou **en mode social**
+* **Système de points / badges** selon l’activité (gamification)
+* **Mode "explorateur"** : découverte de contenus selon centres d’intérêt
+* **Dark Mode / Light Mode**
+* **Mini-jeux sociaux** intégrés (JavaScript)
+* **Option de contenu éphémère** (publications visibles 48h seulement)
+* **Filtrage parental** (pour les vidéos)
+* **Zone de contenu audio-only** (type podcasts)
+
+---
+
+## 📅 Plan de Développement (Roadmap)
+
+| Étape | Objectif                                       |
+| ----- | ---------------------------------------------- |
+| 1     | Authentification + structure MVC               |
+| 2     | Module messagerie                              |
+| 3     | Module réseau social (posts, amis, fil d'actu) |
+| 4     | Module vidéo complet                           |
+| 5     | Notifications                                  |
+| 6     | Fonctionnalités originales                     |
+| 7     | Optimisation responsive                        |
+| 8     | Sécurité et validation                         |
+| 9     | Tests + débogage                               |
+| 10    | Déploiement final                              |
+
+---
+
+la conception de ce site web se fera en php css bootstrap javascript et mysql, n'utilise pas react, utilise juste php css bootstrap javascripte et mysql, note que j'utilise wamppserver, aussi l'application devra avoir un preloader extremement style avec une barre de chargement irreguliere et discontinue. aussi si tu pense que d'autres fonctionnalité sont necessaire rajouter les mais en fesait en sorte que l'application reste ultra beau et convivial, rassure toi enormement de la responsitiviter, et sur mobile elle devra ressembler a une application mobile, fait en sorte que se soit le plus beau resau et le plus complet qu'on est vu, bonne chance

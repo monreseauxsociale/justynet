@@ -22,6 +22,19 @@ class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH) ?? '/';
+        $path = rawurldecode($path);
+
+        // Strip base path if app is served from a subdirectory (e.g. /JN)
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+        if ($scriptDir && $scriptDir !== '/' && strncmp($path, $scriptDir, strlen($scriptDir)) === 0) {
+            $path = substr($path, strlen($scriptDir));
+            if ($path === '' || $path === false) { $path = '/'; }
+        }
+
+        // Normalize index.php to root
+        if ($path === '/index.php') { $path = '/'; }
+
         $path = $this->normalize($path);
         $handler = $this->routes[$method][$path] ?? null;
 

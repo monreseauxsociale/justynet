@@ -1,0 +1,41 @@
+/* Root theme */
+:root{
+  --brand:#6c5ce7;
+  --brand-2:#00d2d3;
+}
+
+body{scroll-behavior:smooth}
+
+/* Preloader */
+.preloader{position:fixed;inset:0;background:linear-gradient(135deg,#0f0f10,#1b1b1f);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;}
+.preloader.hidden{opacity:0;visibility:hidden;transition:opacity .6s ease,visibility .6s ease;}
+.loader-bar{position:relative;width:80vw;max-width:520px;height:8px;background:rgba(255,255,255,.08);border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);}
+.loader-bar .seg{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,var(--brand),var(--brand-2));border-radius:8px;filter:drop-shadow(0 4px 10px rgba(108,92,231,.35));}
+.seg.s1{left:2%;width:18%;animation:seg1 1.2s infinite cubic-bezier(.65,.05,.36,1);} 
+.seg.s2{left:28%;width:9%;animation:seg2 1.5s infinite cubic-bezier(.4,0,.2,1);} 
+.seg.s3{left:42%;width:22%;animation:seg3 1.1s infinite cubic-bezier(.2,.8,.2,1);} 
+.seg.s4{left:70%;width:12%;animation:seg4 1.6s infinite cubic-bezier(.86,0,.07,1);} 
+.seg.s5{left:86%;width:6%; animation:seg5 1.3s infinite steps(5);} 
+@keyframes seg1{0%{transform:translateX(-15%)}50%{transform:translateX(25%)}100%{transform:translateX(140%)}}
+@keyframes seg2{0%{transform:translateX(-10%)}50%{transform:translateX(20%)}100%{transform:translateX(130%)}}
+@keyframes seg3{0%{transform:translateX(-20%)}50%{transform:translateX(10%)}100%{transform:translateX(120%)}}
+@keyframes seg4{0%{transform:translateX(-5%)}50%{transform:translateX(15%)}100%{transform:translateX(125%)}}
+@keyframes seg5{0%{transform:translateX(-8%)}50%{transform:translateX(22%)}100%{transform:translateX(118%)}}
+.loader-title{color:#eaeaf0;margin-top:16px;letter-spacing:.3px;opacity:.9}
+
+/* Cards */
+.card{border:0;border-radius:14px}
+.card .card-body{padding:1rem 1rem}
+.navbar-brand{letter-spacing:.5px}
+
+/* Chat */
+#thread{background:linear-gradient(180deg,#0f0f10,#121217);color:#eaeaf0;border-radius:12px}
+#thread .msg{max-width:80%;padding:.5rem .75rem;border-radius:14px;margin:.25rem 0}
+#thread .me{margin-left:auto;background:#2a2f3a}
+#thread .you{margin-right:auto;background:#1d2230}
+
+/* Responsive tweaks */
+@media (max-width: 768px){
+  .navbar .navbar-brand{font-size:1.15rem}
+  main.container{padding-top:72px}
+}

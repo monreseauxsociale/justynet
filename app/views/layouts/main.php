@@ -31,6 +31,13 @@
         <li class="nav-item"><a class="nav-link" href="/feed">Social</a></li>
         <li class="nav-item"><a class="nav-link" href="/messages">Messages</a></li>
         <li class="nav-item"><a class="nav-link" href="/video">Vidéos</a></li>
+        <li class="nav-item"><a class="nav-link" href="/channel">Chaînes</a></li>
+        <li class="nav-item"><a class="nav-link" href="/playlist">Playlists</a></li>
+        <li class="nav-item"><a class="nav-link" href="/search">Recherche</a></li>
+        <li class="nav-item"><a class="nav-link" href="/pages">Pages</a></li>
+        <li class="nav-item"><a class="nav-link" href="/groups">Groupes</a></li>
+        <li class="nav-item"><a class="nav-link" href="/events">Événements</a></li>
+        <li class="nav-item"><a class="nav-link" href="/explorer">Explorer</a></li>
       </ul>
       <ul class="navbar-nav">
         <?php if (!empty($_SESSION['user_id'])): ?>

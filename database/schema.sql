@@ -67,3 +67,292 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Channels and subscriptions
+CREATE TABLE IF NOT EXISTS channels (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  description TEXT NULL,
+  banner VARCHAR(255) NULL,
+  socials JSON NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS channel_subscriptions (
+  user_id INT NOT NULL,
+  channel_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(user_id, channel_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Video tags, likes/dislikes, views, shares, downloads, playlists
+ALTER TABLE videos ADD COLUMN channel_id INT NULL, ADD COLUMN allow_download TINYINT(1) DEFAULT 0, ADD COLUMN is_mature TINYINT(1) DEFAULT 0;
+ALTER TABLE videos ADD CONSTRAINT fk_videos_channel FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE SET NULL;
+
+CREATE TABLE IF NOT EXISTS video_tags (
+  video_id INT NOT NULL,
+  tag VARCHAR(50) NOT NULL,
+  PRIMARY KEY(video_id, tag),
+  FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS video_likes (
+  user_id INT NOT NULL,
+  video_id INT NOT NULL,
+  type ENUM('like','dislike') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(user_id, video_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS video_views (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  video_id INT NOT NULL,
+  user_id INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS video_shares (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  video_id INT NOT NULL,
+  user_id INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS video_downloads (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  video_id INT NOT NULL,
+  user_id INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS playlists (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  visibility ENUM('public','private') DEFAULT 'public',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS playlist_videos (
+  playlist_id INT NOT NULL,
+  video_id INT NOT NULL,
+  position INT DEFAULT 0,
+  PRIMARY KEY(playlist_id, video_id),
+  FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
+  FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Messaging: presence, groups, statuses(stories), message status, attachments, reactions, pinned
+ALTER TABLE users ADD COLUMN last_active TIMESTAMP NULL, ADD COLUMN settings JSON NULL;
+
+CREATE TABLE IF NOT EXISTS chat_groups (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  owner_id INT NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  avatar VARCHAR(255) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS chat_group_members (
+  group_id INT NOT NULL,
+  user_id INT NOT NULL,
+  role ENUM('member','admin') DEFAULT 'member',
+  PRIMARY KEY(group_id, user_id),
+  FOREIGN KEY (group_id) REFERENCES chat_groups(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS group_messages (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  group_id INT NOT NULL,
+  from_id INT NOT NULL,
+  text TEXT NULL,
+  attachment_type ENUM('image','audio','video','document') NULL,
+  attachment_path VARCHAR(255) NULL,
+  pinned TINYINT(1) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (group_id) REFERENCES chat_groups(id) ON DELETE CASCADE,
+  FOREIGN KEY (from_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS message_status (
+  message_id BIGINT NOT NULL,
+  user_id INT NOT NULL,
+  delivered_at TIMESTAMP NULL,
+  seen_at TIMESTAMP NULL,
+  PRIMARY KEY(message_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS message_reactions (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  message_id BIGINT NOT NULL,
+  user_id INT NOT NULL,
+  emoji VARCHAR(16) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS stories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  kind ENUM('text','image','video') NOT NULL,
+  text TEXT NULL,
+  media_path VARCHAR(255) NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Social: friends, blocks, posts media, replies, shares, pages, groups, events
+CREATE TABLE IF NOT EXISTS friend_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  from_id INT NOT NULL,
+  to_id INT NOT NULL,
+  status ENUM('pending','accepted','rejected') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_req (from_id, to_id),
+  FOREIGN KEY (from_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (to_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS blocks (
+  user_id INT NOT NULL,
+  blocked_user_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(user_id, blocked_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE comments ADD COLUMN parent_id INT NULL;
+CREATE INDEX idx_comments_post ON comments(post_id);
+
+CREATE TABLE IF NOT EXISTS post_media (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  post_id INT NOT NULL,
+  kind ENUM('image','video','link') NOT NULL,
+  path TEXT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS post_shares (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  post_id INT NOT NULL,
+  user_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE reactions MODIFY COLUMN type VARCHAR(20) NOT NULL; -- allow multiple reaction types like love, haha, wow, sad, angry
+
+CREATE TABLE IF NOT EXISTS pages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  owner_id INT NOT NULL,
+  name VARCHAR(150) NOT NULL,
+  description TEXT NULL,
+  avatar VARCHAR(255) NULL,
+  banner VARCHAR(255) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS page_admins (
+  page_id INT NOT NULL,
+  user_id INT NOT NULL,
+  role ENUM('admin','editor') DEFAULT 'admin',
+  PRIMARY KEY(page_id, user_id),
+  FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS page_posts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  page_id INT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS social_groups (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  owner_id INT NOT NULL,
+  name VARCHAR(150) NOT NULL,
+  privacy ENUM('public','private') DEFAULT 'public',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS social_group_members (
+  group_id INT NOT NULL,
+  user_id INT NOT NULL,
+  role ENUM('member','admin') DEFAULT 'member',
+  PRIMARY KEY(group_id, user_id),
+  FOREIGN KEY (group_id) REFERENCES social_groups(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS events (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  creator_id INT NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  location VARCHAR(255) NULL,
+  start_at DATETIME NOT NULL,
+  description TEXT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS event_invites (
+  user_id INT NOT NULL,
+  event_id INT NOT NULL,
+  status ENUM('invited','interested','going','declined') DEFAULT 'invited',
+  PRIMARY KEY(user_id, event_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Gamification and Explorer
+CREATE TABLE IF NOT EXISTS user_points (
+  user_id INT PRIMARY KEY,
+  points INT DEFAULT 0,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS badges (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(50) UNIQUE,
+  name VARCHAR(100) NOT NULL,
+  description TEXT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS user_badges (
+  user_id INT NOT NULL,
+  badge_id INT NOT NULL,
+  earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(user_id, badge_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (badge_id) REFERENCES badges(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS user_interests (
+  user_id INT NOT NULL,
+  tag VARCHAR(50) NOT NULL,
+  PRIMARY KEY(user_id, tag),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Ephemeral posts
+ALTER TABLE posts ADD COLUMN expires_at DATETIME NULL;
